@@ -1,0 +1,89 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Teleporter.App"
+             RequestedThemeVariant="Default">
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="AppBgBrush" Color="#F5F6F9"/>
+          <SolidColorBrush x:Key="CardBgBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="CardBorderBrush" Color="#E2E4EA"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#6B7080"/>
+          <SolidColorBrush x:Key="AccentBrush" Color="#4F46E5"/>
+          <SolidColorBrush x:Key="DangerBrush" Color="#C0262D"/>
+          <SolidColorBrush x:Key="TrackBrush" Color="#E7E9EF"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="AppBgBrush" Color="#16171B"/>
+          <SolidColorBrush x:Key="CardBgBrush" Color="#202227"/>
+          <SolidColorBrush x:Key="CardBorderBrush" Color="#33353C"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#9095A0"/>
+          <SolidColorBrush x:Key="AccentBrush" Color="#818CF8"/>
+          <SolidColorBrush x:Key="DangerBrush" Color="#F2555B"/>
+          <SolidColorBrush x:Key="TrackBrush" Color="#2B2D33"/>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="16,14" />
+    </Style>
+    <Style Selector="TextBlock.h1">
+      <Setter Property="FontSize" Value="20" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.h2">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="MinHeight" Value="36" />
+      <Setter Property="Padding" Value="12,4" />
+    </Style>
+    <Style Selector="ListBox">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.accent">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.danger">
+      <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </Application.Styles>
+
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/app.ico" ToolTipText="Teleporter" Clicked="OnTrayClicked">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Open Teleporter" Click="OnOpenClicked" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Open data folder" Click="OnDataFolderClicked" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Exit" Click="OnExitClicked" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
+
+</Application>

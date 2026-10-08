@@ -1,0 +1,4 @@
+# LF everywhere: helper.py and the bash snippets embedded in .cs files run on Linux.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ico binary

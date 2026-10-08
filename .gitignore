@@ -1,0 +1,11 @@
+bin/
+obj/
+dist/
+.vs/
+*.user
+.idea/
+.claude/settings.local.json
+Teleporter.data/
+*.log
+Thumbs.db
+desktop.ini

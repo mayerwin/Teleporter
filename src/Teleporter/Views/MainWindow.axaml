@@ -1,0 +1,216 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Teleporter.Views.MainWindow"
+        Title="Teleporter"
+        Icon="/app.ico"
+        Width="980" Height="720" MinWidth="760" MinHeight="520"
+        Background="{DynamicResource AppBgBrush}"
+        WindowStartupLocation="CenterScreen">
+
+  <DockPanel Margin="18">
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+      <StackPanel>
+        <TextBlock Classes="h1" Text="Teleporter" />
+        <TextBlock x:Name="ServerLine" Classes="muted" Text="No server configured yet. Open Settings." />
+      </StackPanel>
+      <TextBlock x:Name="StatusLine" Grid.Column="1" Classes="muted" VerticalAlignment="Bottom" MaxWidth="460" TextAlignment="Right" />
+    </Grid>
+
+    <TabControl x:Name="Tabs">
+
+      <!-- ───────────── Projects ───────────── -->
+      <TabItem Header="Projects">
+        <DockPanel Margin="0,10,0,0">
+          <Border x:Name="ExpiredBanner" Classes="card" DockPanel.Dock="Top" Margin="0,0,0,12" IsVisible="False">
+            <TextBlock x:Name="ExpiredText" TextWrapping="Wrap" />
+          </Border>
+
+          <Border Classes="card" DockPanel.Dock="Top" Margin="0,0,0,12">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h2" Text="New project on the server" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <TextBox x:Name="NewName" Width="240" PlaceholderText="project-name" />
+                  <CheckBox x:Name="NewGit" IsChecked="True" Content="Initialize as a git repo" />
+                  <Button x:Name="CreateButton" Classes="accent" Content="Create" Click="OnCreateClicked" />
+                </StackPanel>
+              </StackPanel>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <Button Classes="accent" Content="Send a local folder to the server…" Click="OnSendClicked" HorizontalAlignment="Right" />
+                <TextBlock Classes="muted" Text="Any folder, git or not. Every file is verified." HorizontalAlignment="Right" />
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <Border Classes="card" DockPanel.Dock="Bottom" Margin="0,12,0,0">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h2" Text="Set-aside copies" />
+              <TextBlock x:Name="ParkedEmpty" Classes="muted" Text="None. After a move, the original is kept here until you delete it." />
+              <ScrollViewer MaxHeight="150">
+                <ItemsControl x:Name="ParkedList" />
+              </ScrollViewer>
+            </StackPanel>
+          </Border>
+
+          <Border Classes="card">
+            <DockPanel>
+              <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                <TextBlock Classes="h2" Text="Projects on the server" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <Button x:Name="OpenCodeButton" Content="Open in VS Code" Click="OnOpenInCodeClicked" />
+                  <Button x:Name="OpenAgyButton" Content="Open in Antigravity" Click="OnOpenInAgyClicked" />
+                  <Button Content="Terminal" Click="OnTerminalClicked" />
+                  <Button x:Name="AgentButton" Content="Start Claude agent" Click="OnAgentClicked"
+                          ToolTip.Tip="Runs claude remote-control for this project as a service on the server: it survives this PC being off, and you steer it from Claude Desktop, claude.ai/code or your phone." />
+                  <Button Content="Bring back…" Click="OnBringBackClicked" />
+                </StackPanel>
+              </Grid>
+              <ListBox x:Name="ProjectList" SelectionChanged="OnProjectSelected" />
+            </DockPanel>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ───────────── Server ───────────── -->
+      <TabItem Header="Server">
+        <ScrollViewer Margin="0,10,0,0">
+          <StackPanel Spacing="12">
+            <Border Classes="card">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h2" Text="Memory" />
+                <Grid x:Name="MemBar" Height="14" ClipToBounds="True">
+                  <Border Background="{DynamicResource TrackBrush}" CornerRadius="7" />
+                  <StackPanel x:Name="MemSegments" Orientation="Horizontal" />
+                </Grid>
+                <TextBlock x:Name="MemText" Classes="muted" />
+                <ItemsControl x:Name="GroupList" />
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h2" Text="Loaded models" />
+                <TextBlock x:Name="ModelsEmpty" Classes="muted" Text="None, or no llama-swap URL set." />
+                <ItemsControl x:Name="ModelList" />
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h2" Text="This account" />
+                <TextBlock x:Name="ProcText" Classes="muted" />
+                <ItemsControl x:Name="ServiceList" />
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,6,0,0">
+                  <Button x:Name="StopAllButton" Classes="danger" Content="Stop everything" Click="OnStopAllClicked" />
+                  <TextBlock Classes="muted" VerticalAlignment="Center" MaxWidth="560"
+                             Text="Ends every process of the server account: agents, VS Code and Antigravity servers, terminals, builds, containers. Nothing else on the server is touched." />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="h2" Text="Agent accounts" />
+                  <Button Grid.Column="1" Content="Refresh" Click="OnAgentsRefreshClicked" />
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <TextBlock Text="Claude Code" Width="120" VerticalAlignment="Center" FontWeight="SemiBold" />
+                  <TextBlock x:Name="ClaudeState" Classes="muted" Width="300" VerticalAlignment="Center" />
+                  <Button Content="Sign in…" Click="OnClaudeSignInClicked" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <TextBlock Text="Antigravity" Width="120" VerticalAlignment="Center" FontWeight="SemiBold" />
+                  <TextBlock x:Name="AgyState" Classes="muted" Width="300" VerticalAlignment="Center" TextWrapping="Wrap" />
+                  <Button Content="Install / update" Click="OnAgyInstallClicked" />
+                  <Button Content="Sign in…" Click="OnAgySignInClicked" />
+                  <Button Content="Start daemon" Click="OnAgyStartClicked" />
+                  <Button Content="Stop daemon" Click="OnAgyStopClicked" />
+                </StackPanel>
+                <TextBlock Classes="muted" TextWrapping="Wrap"
+                           Text="Claude: a sign-in window opens the browser; paste the code back into that window. Antigravity: a terminal opens on the server (Windows Terminal, Ctrl+V pastes); sign in there, then close it. The Antigravity daemon is steered from the Antigravity dashboard; Claude agents from Claude Desktop, claude.ai/code or the phone." />
+                <TextBlock Classes="h2" Text="Add-ons" Margin="0,6,0,0" />
+                <TextBlock x:Name="AddonsEmpty" Classes="muted" Text="None installed (Teleporter.data/addons)." />
+                <ItemsControl x:Name="AddonList" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- ───────────── Settings ───────────── -->
+      <TabItem Header="Settings">
+        <ScrollViewer Margin="0,10,0,0">
+          <StackPanel Spacing="12">
+            <Border Classes="card">
+              <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Grid.ColumnSpan="2" Classes="h2" Text="Server" />
+                <TextBlock Grid.Row="1" Text="Name" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="SName" Margin="0,4" />
+                <TextBlock Grid.Row="2" Text="Credentials" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="2" Grid.Column="1" x:Name="SProvider" Margin="0,4" SelectionChanged="OnProviderChanged">
+                  <ComboBoxItem Content="OpenSSH (my own keys and agent)" />
+                  <ComboBoxItem Content="External provider command" />
+                </ComboBox>
+                <TextBlock Grid.Row="3" Text="Provider command" VerticalAlignment="Center" />
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="SProviderCmd" Margin="0,4" PlaceholderText="C:\path\to\provider.sh" />
+                <TextBlock Grid.Row="4" Text="Host / user / port" VerticalAlignment="Center" />
+                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="0,4">
+                  <TextBox x:Name="SHost" Width="220" PlaceholderText="server.example.com" />
+                  <TextBox x:Name="SUser" Width="120" PlaceholderText="dev" />
+                  <NumericUpDown x:Name="SPort" Width="120" Minimum="1" Maximum="65535" FormatString="0" />
+                </StackPanel>
+                <TextBlock Grid.Row="5" Text="Projects folder" VerticalAlignment="Center" />
+                <TextBox Grid.Row="5" Grid.Column="1" x:Name="SRoot" Margin="0,4" PlaceholderText="~/projects" />
+                <TextBlock Grid.Row="6" Text="Toolbx container (optional)" VerticalAlignment="Center" />
+                <TextBox Grid.Row="6" Grid.Column="1" x:Name="SContainer" Margin="0,4" PlaceholderText="my-toolbox" />
+                <TextBlock Grid.Row="7" Text="llama-swap URL (optional)" VerticalAlignment="Center" />
+                <TextBox Grid.Row="7" Grid.Column="1" x:Name="SLlama" Margin="0,4" PlaceholderText="http://server:8080" />
+                <TextBlock Grid.Row="8" Text="Watched services" VerticalAlignment="Center" />
+                <TextBox Grid.Row="8" Grid.Column="1" x:Name="SWatch" Margin="0,4" PlaceholderText="Space-separated system units, e.g. nginx.service" />
+                <TextBlock Grid.Row="9" Grid.Column="1" Classes="muted"
+                           Text="Teleporter connects as the server account above. Everything it starts runs as that account, which is what makes Stop everything safe. With a container set, agents and terminals run inside it." />
+              </Grid>
+            </Border>
+            <Border Classes="card">
+              <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Grid.ColumnSpan="2" Classes="h2" Text="This PC" />
+                <TextBlock Grid.Row="9" Text="Antigravity IDE" VerticalAlignment="Center" />
+                <StackPanel Grid.Row="9" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,4">
+                  <Button x:Name="AgyIdeButton" Content="Set up Antigravity IDE for Teleporter" Click="OnSetupAgyIdeClicked" />
+                  <TextBlock x:Name="AgyIdeState" Classes="muted" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="420" />
+                </StackPanel>
+                <TextBlock Grid.Row="10" Text="Antigravity IDE launcher" VerticalAlignment="Center" />
+                <TextBox Grid.Row="10" Grid.Column="1" x:Name="SAgyLauncher" Margin="0,4" PlaceholderText="Default: the IDE's antigravity-ide.cmd (set a launcher here if the IDE needs a proxy)" />
+                <TextBlock Grid.Row="1" Text="ssh.exe" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="SSshPath" Margin="0,4" />
+                <TextBlock Grid.Row="2" Text="Set-aside folder" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="SParking" Margin="0,4" PlaceholderText="Default: %USERPROFILE%\Teleporter-parked (outside Dropbox)" />
+                <TextBlock Grid.Row="3" Text="Ask to delete after (days)" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="3" Grid.Column="1" x:Name="SParkDays" Width="120" Minimum="1" Maximum="3650" FormatString="0" HorizontalAlignment="Left" Margin="0,4" />
+                <TextBlock Grid.Row="4" Text="Skip when moving" VerticalAlignment="Center" />
+                <TextBox Grid.Row="4" Grid.Column="1" x:Name="SSkip" Margin="0,4" PlaceholderText="node_modules .venv venv" />
+                <TextBlock Grid.Row="5" Text="Theme" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="5" Grid.Column="1" x:Name="STheme" Margin="0,4" Width="160">
+                  <ComboBoxItem Content="System" />
+                  <ComboBoxItem Content="Light" />
+                  <ComboBoxItem Content="Dark" />
+                </ComboBox>
+                <TextBlock Grid.Row="6" Text="Start with Windows" VerticalAlignment="Center" />
+                <ToggleSwitch Grid.Row="6" Grid.Column="1" x:Name="SAutostart" Margin="0,4" />
+                <TextBlock Grid.Row="7" Text="VS Code" VerticalAlignment="Center" />
+                <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,4">
+                  <Button x:Name="VsCodeButton" Content="Set up VS Code for Teleporter" Click="OnSetupVsCodeClicked" />
+                  <TextBlock x:Name="VsCodeState" Classes="muted" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="460" />
+                </StackPanel>
+                <TextBlock Grid.Row="8" Text="Data folder" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="8" Grid.Column="1" x:Name="SDataDir" Classes="muted" Margin="0,4" />
+              </Grid>
+            </Border>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="accent" Content="Save" Click="OnSaveClicked" />
+              <TextBlock x:Name="SaveState" Classes="muted" VerticalAlignment="Center" />
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

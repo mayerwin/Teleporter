@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Teleporter</RootNamespace>
+    <AssemblyName>Teleporter</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Version>0.1.0</Version>
+    <Product>Teleporter</Product>
+    <Company>Erwin Mayer</Company>
+    <Description>Move coding projects and their agent sessions between a Windows PC and an always-on Linux server.</Description>
+
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+
+    <!-- One self-contained exe.
+         Compression and trimming are only allowed for self-contained publishes
+         (NETSDK1176 / NETSDK1102), hence the conditions. BUILD.bat passes SelfContained. -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile Condition="'$(SelfContained)' == 'true'">true</EnableCompressionInSingleFile>
+    <PublishTrimmed Condition="'$(SelfContained)' == 'true'">true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <DebugType>embedded</DebugType>
+
+    <!-- Idle cost: no background GC thread (a tray app has nothing to collect concurrently). -->
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="app.ico" />
+    <!-- Uploaded to the server (~/.teleporter/bin/helper.py) on first use. -->
+    <EmbeddedResource Include="Transfer\helper.py" LogicalName="Teleporter.helper.py" />
+  </ItemGroup>
+
+</Project>
